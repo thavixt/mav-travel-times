@@ -13,5 +13,5 @@ export default defineConfig({
     }),
   ],
   // @TODO change project name in package.json aswell
-  base: "/react-ts-vite-template/"
+  base: "/mav-travel-times/"
 })

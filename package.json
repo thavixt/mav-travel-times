@@ -1,6 +1,6 @@
 {
-  "name": "react-ts-vite-template",
-  "homepage": "https://thavixt.github.io/react-ts-vite-template/",
+  "name": "mav-travel-times",
+  "homepage": "https://thavixt.github.io/mav-travel-times/",
   "private": false,
   "version": "0.0.1",
   "type": "module",
@@ -10,9 +10,10 @@
     "dev": "vite",
     "lint": "eslint .",
     "preview": "vite preview",
-    "text": "vitest"
+    "test": "vitest"
   },
   "dependencies": {
+    "ol": "^10.4.0",
     "react": "^19",
     "react-dom": "^19"
   },
