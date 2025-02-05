@@ -10,6 +10,7 @@ export function Info() {
         <li>based on the quickest route on an average weekday</li>
         <li>includes the <a target="__blank" href="https://hu.wikipedia.org/wiki/Magyarorsz%C3%A1g_legnagyobb_telep%C3%BCl%C3%A9sei_lak%C3%B3n%C3%A9pess%C3%A9g_szerint">50 most populated cities of Hungary</a> <small>(except {except} - these cities have no direct rail connections with Budapest)</small></li>
         <li>made with <a target="__blank" href="https://react.dev/">React</a>, map by <a target="__blank" href="https://openlayers.org/">OpenLayers</a></li>
+        <li>source: <a target="__blank" href="https://github.com/thavixt/mav-travel-times">GitHub</a></li>
       </ul>
     </Container>
   )
