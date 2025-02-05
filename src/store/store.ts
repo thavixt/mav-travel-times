@@ -25,6 +25,6 @@ export default useStore;
 
 function getReachableCities(time: number): City[] {
   return CITIES.filter(city => {
-    return city.time <= time;
+    return (city.time > 0) && (city.time <= time);
   })
 }

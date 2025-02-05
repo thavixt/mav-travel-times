@@ -4,12 +4,13 @@ import useStore from "../store/store";
 import { Container } from "./Container";
 
 export function TimeSlider() {
+  const time = useStore(state => state.time);
   const setTime = useStore(state => state.setTime);
 
   return (
-    <Container className="top-10 left-10">
-      <div>Travel time from Budapest:</div>
-      <RangeInput defaultValue={60} min={10} max={MAX_TIME_MIN} onChange={setTime} label="minutes" />
+    <Container className="top-10 left-10 w-3/5 !space-y-0">
+      <div>See how far can you get from Budapest in</div>
+      <RangeInput defaultValue={time} min={10} max={MAX_TIME_MIN} onChange={setTime} label="minutes with MÁV" />
     </Container>
   )
 }
@@ -32,7 +33,7 @@ function RangeInput({ defaultValue, min, max, onChange: onChangeProp, label }: R
   }
 
   return (
-    <div className="flex flex-col space-y-2">
+    <div className="flex flex-col">
       <input
         max={max}
         min={min}
@@ -40,7 +41,9 @@ function RangeInput({ defaultValue, min, max, onChange: onChangeProp, label }: R
         type="range"
         defaultValue={defaultValue}
       />
-      {value} {label}
+      <div>
+        <strong>{value}</strong> {label}
+      </div>
     </div>
   )
 }

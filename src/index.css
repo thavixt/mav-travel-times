@@ -45,3 +45,7 @@ body {
 input {
   @apply bg-slate-200 text-slate-500 border border-slate-300 rounded-md px-2;
 }
+
+a {
+  @apply text-blue-600 underline underline-offset-2 hover:text-blue-400;
+}

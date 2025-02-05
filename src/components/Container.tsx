@@ -19,6 +19,6 @@ export function Container({ children, className }: PropsWithChildren<{ className
   }
 
   return (
-    <div className={classNames("absolute border-2 border-slate-300 bg-slate-200 rounded-lg p-2 shadow-xl flex flex-col space-y-2", className)}>{children}</div>
+    <div className={classNames("z-10 absolute border-2 border-slate-300 bg-slate-200 rounded-lg p-2 shadow-xl flex flex-col space-y-2", className)}>{children}</div>
   )
 }

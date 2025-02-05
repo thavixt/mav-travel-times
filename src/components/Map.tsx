@@ -1,41 +1,17 @@
 import Feature from "ol/Feature";
-import Fill from "ol/style/Fill";
-import OpenLayersMap from 'ol/Map.js';
 import Point from "ol/geom/Point";
-import Style from "ol/style/Style";
 import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
-import View from "ol/View";
-import useStore from "../store/store";
+import OpenLayersMap from 'ol/Map.js';
 import { OSM, Vector } from "ol/source";
-import Stroke from "ol/style/Stroke";
-import CircleStyle from 'ol/style/Circle';
-
+import View from "ol/View";
 import { useState, useEffect, useRef } from "react";
-import { BUDAPEST_COORDINATES, tc } from "../constants";
-
-// const style = new Style({
-//   fill: new Fill({
-//     color: [255, 0, 0, 1],
-//   }),
-//   stroke: new Stroke({
-//     width: 6,
-//     color: [0, 0, 255, 1],
-//   }),
-// });
-
-const circleStyle = new Style({
-  image: new CircleStyle({
-    radius: 7,
-    fill: new Fill({
-      color: [255, 255, 0, 0.7],
-    }),
-    stroke: new Stroke({
-      width: 6,
-      color: [0, 0, 200, 0.7],
-    }),
-  }),
-});
+import { BUDAPEST_COORDINATES } from "../constants";
+import useStore from "../store/store";
+import { GrahamScan } from "../utils/grahamScan";
+import { tc, createVectorSource } from "../utils/utils";
+import { Coordinates } from "../types";
+import { bpCircleStyle, circleStyle, grahamScanStyle } from "../utils/styles";
 
 export function Map() {
   const [loading, setLoading] = useState(false);
@@ -50,15 +26,13 @@ export function Map() {
     setLoading(true);
 
     const olMap = new OpenLayersMap({
-      // disable controls
-      // zooming and panning is disabled by blocking pointer events with CSS
-      controls: [],
+      controls: [], // disable controls
       layers: [
         new TileLayer({ source: new OSM() }),
       ],
       view: new View({
         center: tc({
-          lat: BUDAPEST_COORDINATES.lat - 0.6,
+          lat: BUDAPEST_COORDINATES.lat - 0.3,
           lng: BUDAPEST_COORDINATES.lng + 0.7,
         }),
         zoom: 8,
@@ -67,6 +41,19 @@ export function Map() {
     });
 
     map.current = olMap;
+
+    const bpMarkerLayer = new VectorLayer({
+      source: new Vector({
+        features: [
+          new Feature({
+            geometry: new Point(tc(BUDAPEST_COORDINATES))
+          })
+        ]
+      }),
+      style: bpCircleStyle,
+    });
+    map.current.addLayer(bpMarkerLayer);
+
     setLoading(false);
 
     return () => {
@@ -92,31 +79,6 @@ export function Map() {
 
     const reachableCities = getReachable();
     const reachableCoords = reachableCities.map(city => city.gps);
-    reachableCoords.push(BUDAPEST_COORDINATES);
-
-    // vector layer
-    // const grahamScan = new GrahamScan();
-    // reachableCoords.forEach(c => {
-    //   grahamScan.addPoint(c.lng, c.lat);
-    // })
-    // const hull = grahamScan.getHull();
-    // if (!hull) {
-    //   console.error('GrahamScan failed', hull);
-    //   return;
-    // }
-    // const hullCoordinates = hull?.map<Coordinates>(p => {
-    //   return {
-    //     lng: p.x,
-    //     lat: p.y,
-    //   }
-    // })
-    // const vectorLayer = new VectorLayer({
-    //   source: createVectorSource([
-    //     ...hullCoordinates,
-    //   ]),
-    //   style,
-    // });
-
     // marker layer
     const markerLayer = new VectorLayer({
       source: new Vector({
@@ -125,20 +87,38 @@ export function Map() {
             geometry: new Point(tc(c))
           })
         ))
-        // features: [
-        //   new Feature({
-        //     geometry: new Point(tc(BUDAPEST_COORDINATES))
-        //   })
-        // ]
       }),
       style: circleStyle,
     });
 
-    // map.current.addLayer(vectorLayer);
+    // vector layer
+    reachableCoords.push(BUDAPEST_COORDINATES);
+    const grahamScan = new GrahamScan();
+    reachableCoords.forEach(c => {
+      grahamScan.addPoint(c.lng, c.lat);
+    })
+    const hull = grahamScan.getHull();
+    if (!hull) {
+      console.error('GrahamScan failed', hull);
+      return;
+    }
+    const hullCoordinates = hull?.map<Coordinates>(p => {
+      return {
+        lng: p.x,
+        lat: p.y,
+      }
+    })
+    const vectorLayer = new VectorLayer({
+      source: createVectorSource([
+        ...hullCoordinates,
+      ]),
+      style: grahamScanStyle,
+    });
+
+    map.current.addLayer(vectorLayer);
     map.current.addLayer(markerLayer);
 
-    // layers.current = [vectorLayer, markerLayer];
-    layers.current = [markerLayer];
+    layers.current = [vectorLayer, markerLayer];
     setLoading(false);
   }, [map, time])
 
@@ -148,10 +128,11 @@ export function Map() {
     )
   }
 
+  // pointer-events-none
   return (
     <div
       id="map"
-      className="size-full absolute top-0 pointer-events-none -z-50"
+      className="size-full absolute top-0 z-0"
     />
   )
 }
