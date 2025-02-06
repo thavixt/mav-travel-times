@@ -1,16 +1,22 @@
 import { ChangeEvent, useState } from "react"
-import { MAX_TIME_MIN } from "../constants";
 import useStore from "../store/store";
 import { Container } from "./Container";
 
 export function TimeSlider() {
+  const citiesLoaded = useStore(state => state.loadCities);
   const time = useStore(state => state.time);
+  const getMaxTime = useStore(state => state.getMaxTime);
   const setTime = useStore(state => state.setTime);
 
+  if (!citiesLoaded) {
+    return null;
+  }
+  
+  const max = getMaxTime();
   return (
-    <Container className="top-10 left-10 w-3/5 !space-y-0">
+    <Container className="top-10 left-10 w-2/5 !space-y-0">
       <div>See how far can you get from Budapest in</div>
-      <RangeInput defaultValue={time} min={10} max={MAX_TIME_MIN} onChange={setTime} label="minutes with MÁV" />
+      <RangeInput defaultValue={time} min={0} max={max} onChange={setTime} label="minutes with MÁV" />
     </Container>
   )
 }

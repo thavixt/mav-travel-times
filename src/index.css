@@ -28,7 +28,7 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  @apply text-gray-800 bg-slate-300;
+  @apply text-gray-800 bg-slate-600;
 }
 
 body {

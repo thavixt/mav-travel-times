@@ -1,10 +1,8 @@
 import Feature from "ol/Feature";
 import Point from "ol/geom/Point";
-import TileLayer from "ol/layer/Tile";
 import VectorLayer from "ol/layer/Vector";
 import OpenLayersMap from 'ol/Map.js';
 import { OSM, Vector } from "ol/source";
-import View from "ol/View";
 import { useState, useEffect, useRef } from "react";
 import { BUDAPEST_COORDINATES } from "../constants";
 import useStore from "../store/store";
@@ -12,35 +10,38 @@ import { GrahamScan } from "../utils/grahamScan";
 import { tc, createVectorSource } from "../utils/utils";
 import { Coordinates } from "../types";
 import { bpCircleStyle, circleStyle, grahamScanStyle } from "../utils/styles";
+import { View } from "ol";
+import TileLayer from "ol/layer/Tile";
 
 export function Map() {
-  const [loading, setLoading] = useState(false);
-  const getReachable = useStore(state => state.getReachable);
-  const time = useStore(state => state.time);
-
-  // OpenLayers stuff refs
-  const map = useRef<OpenLayersMap | null>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const olMap = useRef<OpenLayersMap>(null);
   const layers = useRef<VectorLayer[]>([]);
 
-  useEffect(() => {
-    setLoading(true);
+  const [mapLoading, setMapLoading] = useState(true);
 
-    const olMap = new OpenLayersMap({
+  const time = useStore(state => state.time);
+  const getReachable = useStore(state => state.getReachable);
+
+  useEffect(() => {
+    if (!mapContainerRef.current) {
+      return;
+    }
+
+    const map = new OpenLayersMap({
       controls: [], // disable controls
       layers: [
         new TileLayer({ source: new OSM() }),
       ],
       view: new View({
         center: tc({
-          lat: BUDAPEST_COORDINATES.lat - 0.3,
-          lng: BUDAPEST_COORDINATES.lng + 0.7,
+          lat: BUDAPEST_COORDINATES.lat - 0.5,
+          lng: BUDAPEST_COORDINATES.lng + 0.6,
         }),
         zoom: 8,
       }),
-      target: 'map',
+      target: mapContainerRef.current,
     });
-
-    map.current = olMap;
 
     const bpMarkerLayer = new VectorLayer({
       source: new Vector({
@@ -52,13 +53,13 @@ export function Map() {
       }),
       style: bpCircleStyle,
     });
-    map.current.addLayer(bpMarkerLayer);
+    map.addLayer(bpMarkerLayer);
+    setMapLoading(false);
+    olMap.current = map;
 
-    setLoading(false);
-
+    const mapContainer = mapContainerRef.current;
     return () => {
-      map.current = null;
-      const mapContainer = document.getElementById('map');
+      olMap.current = null;
       if (mapContainer) {
         mapContainer.innerHTML = '';
       }
@@ -66,19 +67,23 @@ export function Map() {
   }, [])
 
   useEffect(() => {
-    if (!map.current) {
+    if (!olMap.current) {
       return;
     }
-    setLoading(true);
+
     if (layers.current) {
       layers.current.forEach(layer => {
-        map.current?.removeLayer(layer);
+        if (!olMap.current) {
+          return;
+        }
+        olMap.current.removeLayer(layer);
       })
       layers.current = [];
     }
 
     const reachableCities = getReachable();
     const reachableCoords = reachableCities.map(city => city.gps);
+
     // marker layer
     const markerLayer = new VectorLayer({
       source: new Vector({
@@ -97,11 +102,13 @@ export function Map() {
     reachableCoords.forEach(c => {
       grahamScan.addPoint(c.lng, c.lat);
     })
+
     const hull = grahamScan.getHull();
     if (!hull) {
       console.error('GrahamScan failed', hull);
       return;
     }
+
     const hullCoordinates = hull?.map<Coordinates>(p => {
       return {
         lng: p.x,
@@ -115,24 +122,19 @@ export function Map() {
       style: grahamScanStyle,
     });
 
-    map.current.addLayer(vectorLayer);
-    map.current.addLayer(markerLayer);
-
-    layers.current = [vectorLayer, markerLayer];
-    setLoading(false);
-  }, [map, time])
-
-  if (loading) {
-    return (
-      <div className="size-full place-items-center text-center">Loading...</div>
-    )
-  }
+    olMap.current.addLayer(vectorLayer);
+    olMap.current.addLayer(markerLayer); layers.current = [vectorLayer, markerLayer];
+  }, [time, getReachable])
 
   // pointer-events-none
   return (
     <div
-      id="map"
-      className="size-full absolute top-0 z-0"
-    />
+      ref={mapContainerRef}
+      className="size-full absolute top-0 z-0 flex flex-col items-center justify-center bg-slate-400"
+    >
+      {mapLoading ? (
+        <div>Loading...</div>
+      ) : null}
+    </div>
   )
 }
