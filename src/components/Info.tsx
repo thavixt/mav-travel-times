@@ -2,7 +2,7 @@ import { Container } from "./Container";
 
 export function Info() {
   return (
-    <Container className="bottom-10 left-10 max-w-2/3">
+    <Container className="bottom-5 right-5 max-w-1/2 invisible md:visible">
       <ul className="pl-6 text-sm list-outside list-disc">
         <li>data from <a target="__blank" href="https://jegy.mav.hu/">jegy.mav.hu</a> as of <em>2025.02.06.</em></li>
         <li>based on the quickest route on an average weekday</li>

@@ -14,9 +14,9 @@ export function TimeSlider() {
   
   const max = getMaxTime();
   return (
-    <Container className="top-10 left-10 w-2/5 !space-y-0">
-      <div>See how far can you get from <a href="https://en.wikipedia.org/wiki/Budapest">Budapest</a> in</div>
-      <RangeInput defaultValue={time} min={0} max={max} onChange={setTime} label="minutes with MÁV" />
+    <Container className="top-5 left-5 w-fit !space-y-0">
+      <div>How far can you get from <a href="https://en.wikipedia.org/wiki/Budapest">Budapest</a> in</div>
+      <RangeInput defaultValue={time} min={0} max={max} onChange={setTime} label="minutes with MÁV?" />
     </Container>
   )
 }

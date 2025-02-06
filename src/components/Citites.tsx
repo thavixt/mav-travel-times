@@ -12,7 +12,7 @@ export function Cities() {
   const reachableCities = getReachable();
 
   const cities = useMemo(() => {
-    const matching = reachableCities.filter(city => city.name.includes(search));
+    const matching = reachableCities.filter(city => city.name.toLowerCase().includes(search.toLowerCase()));
     const sorted = matching.sort((aCity, bCity) => (
       (aCity.time < bCity.time) ? 1 : -1
     ));
@@ -24,9 +24,9 @@ export function Cities() {
   }
 
   return (
-    <Container className="bottom-10 right-10 w-[300px]">
+    <Container className="bottom-5 left-5 w-[300px]">
       <input type="search" name="search" placeholder="Search for a city" onChange={e => setSearch(e.target.value)} />
-      <div className="h-[400px] overflow-y-auto">
+      <div className="h-[150px] md:h-[400px] overflow-y-auto">
         <div className="min-h-0 overflow-y-auto">
           <ul className="px-1">
             {cities.map(v => (

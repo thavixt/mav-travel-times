@@ -36,7 +36,7 @@ export function Map() {
       view: new View({
         center: tc({
           lat: BUDAPEST_COORDINATES.lat - 0.5,
-          lng: BUDAPEST_COORDINATES.lng + 0.6,
+          lng: BUDAPEST_COORDINATES.lng,
         }),
         zoom: 8,
       }),

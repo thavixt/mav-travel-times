@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -b && vite build",
     "deploy": "vite build && gh-pages -d dist",
-    "dev": "vite",
+    "dev": "vite --host",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest"
